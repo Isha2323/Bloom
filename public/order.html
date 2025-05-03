@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fetch Orders with Session</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+      }
+      input,
+      button {
+        padding: 10px;
+        margin: 10px;
+      }
+      table {
+        width: 80%;
+        margin: 20px auto;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        border: 1px solid black;
+        padding: 10px;
+        text-align: left;
+      }
+      th {
+        background-color: lightgray;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Enter Username" />
+    <button onclick="login()">Login</button>
+    <button onclick="logout()">Logout</button>
+
+    <h2>Your Orders</h2>
+    <button onclick="fetchOrders()">Fetch My Orders</button>
+
+    <table id="ordersTable">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Username</th>
+          <th>Address</th>
+          <th>Phone</th>
+          <th>Status</th>
+          <th>Created At</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Orders will be displayed here -->
+      </tbody>
+    </table>
+
+    <script>
+      function fetchOrders() {
+        fetch("http://localhost:3000/getOrders", { credentials: "include" })
+          .then((response) => response.json())
+          .then((data) => {
+            const tbody = document.querySelector("#ordersTable tbody");
+            tbody.innerHTML = ""; // Clear previous data
+
+            if (data.error) {
+              alert(data.error);
+              return;
+            }
+
+            if (data.length === 0) {
+              tbody.innerHTML = "<tr><td colspan='6'>No orders found</td></tr>";
+              return;
+            }
+
+            data.forEach((order) => {
+              const row = `<tr>
+                            <td>${order.id}</td>
+                            <td>${order.username}</td>
+                            <td>${order.address}</td>
+                            <td>${order.phone}</td>
+                            <td>${order.status}</td>
+                            <td>${order.created_at}</td>
+                        </tr>`;
+              tbody.innerHTML += row;
+            });
+          })
+          .catch((error) => console.error("Error fetching orders:", error));
+      }
+    </script>
+  </body>
+</html>
